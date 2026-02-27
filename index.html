@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Invoice Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!--
+    CONTROL BAR — hidden when printing via .no-print
+    New controls: currency select, dark mode, save, new invoice
+  -->
+  <div class="controls no-print">
+    <button id="addItemBtn">+ Add Line Item</button>
+
+    <!-- Currency selector: changes the symbol shown on all amounts -->
+    <select id="currencySelect" title="Change currency symbol">
+      <option value="USD">$ USD</option>
+      <option value="EUR">€ EUR</option>
+      <option value="GBP">£ GBP</option>
+      <option value="CAD">CA$ CAD</option>
+      <option value="AUD">A$ AUD</option>
+    </select>
+
+    <button id="darkModeBtn">🌙 Dark</button>
+    <button id="saveBtn">💾 Save</button>
+    <button id="newInvoiceBtn">+ New Invoice</button>
+    <button id="printBtn">⬇ Download PDF</button>
+  </div>
+
+  <div class="invoice" id="invoice">
+
+    <!-- ── HEADER ── -->
+    <header class="invoice-header">
+      <div class="business-info">
+
+        <!--
+          Logo area: uses TWO named children instead of replacing innerHTML.
+          This lets JS toggle visibility without losing the file input listener.
+        -->
+        <div class="logo-placeholder" id="logoPlaceholder" title="Click to upload logo">
+          <span id="logoText">Click to add logo</span>
+          <img id="logoImg" src="" alt="Logo" />
+          <input type="file" id="logoInput" accept="image/*" />
+        </div>
+
+        <div>
+          <!-- IDs added so JS can save/restore these values -->
+          <div class="editable" contenteditable="true"
+               data-placeholder="Your Business Name"
+               id="businessName">Your Business Name</div>
+          <div class="editable muted" contenteditable="true"
+               data-placeholder="City, State  |  email@example.com"
+               id="businessAddress">City, State  |  email@example.com</div>
+          <div class="editable muted" contenteditable="true"
+               data-placeholder="Phone number"
+               id="businessPhone">Phone number</div>
+        </div>
+      </div>
+
+      <div class="invoice-meta">
+        <h1>INVOICE</h1>
+        <table class="meta-table">
+          <tr>
+            <td class="label">Invoice #</td>
+            <!-- id="invoiceNum" lets JS auto-increment this -->
+            <td><span class="editable" contenteditable="true" id="invoiceNum">001</span></td>
+          </tr>
+          <tr>
+            <td class="label">Date</td>
+            <td><span class="editable" contenteditable="true" id="invoiceDate"></span></td>
+          </tr>
+          <tr>
+            <td class="label">Due Date</td>
+            <td><span class="editable" contenteditable="true" id="dueDate"></span></td>
+          </tr>
+        </table>
+      </div>
+    </header>
+
+    <hr />
+
+    <!-- ── BILL TO ── -->
+    <section class="bill-to">
+      <p class="section-label">BILL TO</p>
+      <div class="editable" contenteditable="true"
+           data-placeholder="Client Name" id="clientName">Client Name</div>
+      <div class="editable muted" contenteditable="true"
+           data-placeholder="Client Address" id="clientAddress">Client Address</div>
+      <div class="editable muted" contenteditable="true"
+           data-placeholder="client@email.com" id="clientEmail">client@email.com</div>
+    </section>
+
+    <!-- ── LINE ITEMS ── -->
+    <section class="line-items">
+      <table id="itemsTable">
+        <thead>
+          <tr>
+            <th class="col-desc">Description</th>
+            <th class="col-qty">Qty</th>
+            <!-- id="rateHeader" lets JS update "(USD)" → "(EUR)" etc. -->
+            <th class="col-rate" id="rateHeader">Rate ($)</th>
+            <th class="col-amount">Amount</th>
+            <th class="col-del no-print"></th>
+          </tr>
+        </thead>
+        <tbody id="itemsBody">
+          <!-- rows injected by JS -->
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ── TOTALS ── -->
+    <section class="totals">
+      <div class="totals-inner">
+
+        <div class="totals-row">
+          <span>Subtotal</span>
+          <span id="subtotal">$0.00</span>
+        </div>
+
+        <!--
+          TAX SECTION — now dynamic (multiple lines).
+          Instead of one hard-coded tax row, JS inserts rows here.
+          Each row has its own label, rate %, and calculated amount.
+        -->
+        <div id="taxesContainer"></div>
+
+        <button class="add-tax-btn no-print" id="addTaxBtn">+ Add Tax Line</button>
+
+        <div class="totals-row total-line">
+          <span>Total Due</span>
+          <span id="totalDue">$0.00</span>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ── NOTES ── -->
+    <section class="notes">
+      <p class="section-label">Notes / Payment Instructions</p>
+      <div class="editable" contenteditable="true"
+           data-placeholder="e.g. Payment due within 30 days."
+           id="invoiceNotes">Payment due within 30 days. Thank you for your business!</div>
+    </section>
+
+  </div><!-- end .invoice -->
+
+  <script src="app.js"></script>
+</body>
+</html>
